@@ -84,21 +84,16 @@ The deep residual neural network (ResNet) architecture, characterized by skip co
 
 Let $b \in \mathbb{Z}_{\ge 0}$ be the number of building blocks, let the input be $x \in \mathbb{R}^{L_{\text{in}}}$, and let the output be $y \in \mathbb{R}^{L_{\text{out}}}$, where $L_{\text{in}}, L_{\text{out}} \in \mathbb{Z}_{\ge 1}$.
 
-For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i+1\}$, let $L_{i,j} \in \mathbb{Z}_{\ge 1}$ denote 
-the number of neurons in the $j^{\text{th}}$ layer for the $i^{\text{th}}$ block. 
-For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i\}$, define the augmented dimension 
-$L_{i,j}^a \triangleq L_{i,j}+1$. Each block function $\Phi_i : \mathbb{R}^{L_{i,0}^a} \times \mathbb{R}^{p_i} \to \mathbb{R}^{L_{i,k_i+1}}$ 
-is a fully connected, feedforward deep neural network (DNN) with $L_{i,k_i+1} \triangleq L_{\text{out}}$ 
-for all $i \in \{0, \ldots, b\}$. For any input $v \in \mathbb{R}^{L_{i,j}^a}$, the DNN is defined recursively by:
-$$
+For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i+1\}$, let $L_{i,j} \in \mathbb{Z}_{\ge 1}$ denote the number of neurons in the $j^{\text{th}}$ layer for the $i^{\text{th}}$ block. For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i\}$, define the augmented dimension $L_{i,j}^a \triangleq L_{i,j}+1$. Each block function $\Phi_i : \mathbb{R}^{L_{i,0}^a} \times \mathbb{R}^{p_i} \to \mathbb{R}^{L_{i,k_i+1}}$ is a fully connected, feedforward deep neural network (DNN) with $L_{i,k_i+1} \triangleq L_{\text{out}}$ for all $i \in \{0, \ldots, b\}$. For any input $v \in \mathbb{R}^{L_{i,j}^a}$, the DNN is defined recursively by:
 
+$$
 \varphi_{i,j}(v) \triangleq \begin{cases} 
 V_{i,0}^{\top}v, & j=0, \\ 
-V_{i,j}^{\top}\phi_{i,j}(\varphi_{i,j-1}(v)), & j \in \{1, \ldots, k_i\}, 
+V_{i,j}^{\top}\phi_{i,j}(\varphi_{i,j-1}(v)), & j \in \{1, \ldots, k_i\} 
 \end{cases}
 $$
 
-with $\Phi_i(v,\theta_i) = \varphi_{i,k_i}(v)$.
+with $\Phi_i(v, \theta_i) = \varphi_{i,k_i}(v)$.
 
 For each $j \in \{0, 1, \ldots, k_i\}$, the matrix $V_{i,j} \in \mathbb{R}^{L_{i,j}^a \times L_{i,j+1}}$ contains the weights and biases; in particular, if a layer has $n$ inputs (including the appended bias) and the subsequent layer has $m$ nodes, then $V \in \mathbb{R}^{n \times m}$ is constructed so that its $(r,c)^{\text{th}}$ entry represents the weight from the $r^{\text{th}}$ node of the input to the $c^{\text{th}}$ node of the output, with the last row corresponding to the bias terms. 
 
