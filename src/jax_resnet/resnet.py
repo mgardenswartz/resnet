@@ -43,7 +43,7 @@ def _get_block_parameters(d_in: int, hidden_width: int, d_out: int, k: int) -> i
     p_out = (hidden_width + 1) * d_out
     return p_in + p_hidden + p_out
 
-def mlp_block(
+def _mlp_block(
     v: jax.Array, 
     theta: jax.Array, 
     in_dim: int, 
@@ -98,7 +98,7 @@ def resnet_network(
     idx += b0_params
     
     x_a = jnp.append(x, 1.0)
-    kappa = mlp_block(x_a, theta_0, d_in, hidden_width, d_out, k_0, h_act_idx, o_act_idx)
+    kappa = _mlp_block(x_a, theta_0, d_in, hidden_width, d_out, k_0, h_act_idx, o_act_idx)
     
     bi_params = _get_block_parameters(d_out, hidden_width, d_out, k_i)
     
@@ -107,7 +107,7 @@ def resnet_network(
         idx += bi_params
         
         psi_out = jnp.append(_activate(kappa, shortcut_act_idx), 1.0)
-        kappa = kappa + mlp_block(psi_out, theta_i, d_out, hidden_width, d_out, k_i, h_act_idx, o_act_idx)
+        kappa = kappa + _mlp_block(psi_out, theta_i, d_out, hidden_width, d_out, k_i, h_act_idx, o_act_idx)
         
     return kappa
 

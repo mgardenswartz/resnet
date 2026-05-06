@@ -4,6 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jax-resnet"
+version = "1.0.0"
+description = "A lightweight JAX ResNet implementation for controls research"
+readme = "README.md"
+requires-python = ">=3.10"
 authors = [
   {name = "Max Gardenswartz", email = "mgardenswartz@ufl.edu"},
   {name = "Cristian Nino"}
@@ -11,14 +15,27 @@ authors = [
 maintainers = [
   {name = "Max Gardenswartz", email = "mgardenswartz@ufl.edu"}
 ]
-version = "1.0.0"
-description = "A lightweight JAX ResNet implementation for controls research"
-readme = "README.md"
-requires-python = ">=3.12"
 dependencies = [
     "jax",
     "jaxlib",
+    "numpy",
+]
+
+[project.optional-dependencies]
+cuda12 = [
+    "jax[cuda12_pip]", 
+    "nvidia-cudnn-cu12",
+]
+cuda13 = [
+    "jax[cuda13_pip]", 
+    "nvidia-cudnn-cu13",
+]
+test = [
+    "pytest",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
