@@ -82,12 +82,7 @@ then rerun first-time setup.
 
 The deep residual neural network (ResNet) architecture, characterized by skip connections and hierarchical feature extraction, models incremental changes rather than complete transformations of the underlying nonlinear mapping. This architecture learns the differences (or "residuals") between input and desired output at each layer, thereby enabling effective function approximation for complex nonlinear systems without requiring explicit governing equations. A fully-connected feedforward ResNet is constructed as follows.
 
-Let $b \in \mathbb{Z}_{\ge 0}$ be the number of building blocks, let the input be $x \in \mathbb{R}^{L_{\text{in}}}$,
-and let the output be $y \in \mathbb{R}^{L_{\text{out}}}$, where $L_{\text{in}}, L_{\text{out}} \in \mathbb{Z}_{\ge 1}$. 
-For each block index $i \in \{0, \ldots, b\}$, let $k_i \in \mathbb{Z}_{\ge 1}$ denote the number of hidden layers 
-in the $i^{\text{th}}$ block, let $\kappa_i \in \mathbb{R}^{L_{i,0}}$ denote the block input, 
-and let $\theta_i \in \mathbb{R}^{p_i}$ denote the vector of parameters (weights and biases) 
-associated with the $i^{\text{th}}$ block. Note that $\kappa_0 \triangleq x$ and $L_{0,0} \triangleq L_{\text{in}}$.
+Let $b \in \mathbb{Z}_{\ge 0}$ be the number of building blocks, let the input be $x \in \mathbb{R}^{L_{\text{in}}}$, and let the output be $y \in \mathbb{R}^{L_{\text{out}}}$, where $L_{\text{in}}, L_{\text{out}} \in \mathbb{Z}_{\ge 1}$.
 
 For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i+1\}$, let $L_{i,j} \in \mathbb{Z}_{\ge 1}$ denote 
 the number of neurons in the $j^{\text{th}}$ layer for the $i^{\text{th}}$ block. 
@@ -139,7 +134,7 @@ $$
 \end{cases}
 $$
 
-with output $y \in \mathbb{R}^{L_{\text{out}}}$ and overall parameter vector $\Theta \triangleq \begin{bmatrix} \theta_0^{\top} & \cdots & \theta_b^{\top} \end{bmatrix}^{\top} \in \mathbb{R}^{{\tt p}}$, with ${\tt p} \triangleq \sum_{i=0}^{b} p_i$. Here, $\kappa_0^a \triangleq \begin{bmatrix} \kappa_0^{\top} & 1 \end{bmatrix}^{\top} \in \mathbb{R}^{L_{0,0}^a}$ denotes the augmented input to block $i=0$. Therefore, the complete ResNet is represented as $\Psi : \mathbb{R}^{L_{\text{in}}} \times \mathbb{R}^{{\tt p}} \to \mathbb{R}^{L_{\text{out}}}$ expressed as:
+with output $y \in \mathbb{R}^{L_{\text{out}}}$ and overall parameter vector $\Theta \triangleq [\theta_0^\top, \dots, \theta_b^\top]^\top \in \mathbb{R}^{\tt p}$, with ${\tt p} \triangleq \sum_{i=0}^{b} p_i$. Here, $\kappa_0^a \triangleq [\kappa_0^\top, 1]^\top \in \mathbb{R}^{L_{0,0}^a}$ denotes the augmented input to block $i=0$. Therefore, the complete ResNet is represented as $\Psi : \mathbb{R}^{L_{\text{in}}} \times \mathbb{R}^{\tt p} \to \mathbb{R}^{L_{\text{out}}}$ expressed as:
 
 $$
 \Psi(x, \Theta) = \kappa_{b+1}
@@ -174,11 +169,11 @@ where $\varkappa_{i,j}$ is defined as:
 The Jacobian $\frac{\partial\phi_{i,j}(\varphi_{i,j-1}(v))}{\partial\varphi_{i,j-1}(v)} : \mathbb{R}^{L_{i,j}} \to \mathbb{R}^{L_{i,j}^a \times L_{i,j}}$ of the activation function vector at the $j^{\text{th}}$ layer is given by:
 
 $$
-\frac{\partial\phi_{i,j}(\varphi_{i,j-1}(v))}{\partial\varphi_{i,j-1}(v)} = \begin{bmatrix} \text{diag}\left\{ \frac{{\rm d}\varsigma_{i,1}((\varphi_{i,j-1})_1)}{{\rm d}(\varphi_{i,j-1})_1}, \ldots, \frac{{\rm d}\varsigma_{i,L_{i,j}}((\varphi_{i,j-1})_{L_{i,j}})}{{\rm d}(\varphi_{i,j-1})_{L_{i,j}}} \right\} \\ \mathbf{0}_{L_{i,j}}^{\top} \end{bmatrix}
+\frac{\partial\phi_{i,j}(\varphi_{i,j-1}(v))}{\partial\varphi_{i,j-1}(v)} = \begin{bmatrix} \text{diag}\left( \frac{{\rm d}\varsigma_{i,1}((\varphi_{i,j-1})_1)}{{\rm d}(\varphi_{i,j-1})_1}, \ldots, \frac{{\rm d}\varsigma_{i,L_{i,j}}((\varphi_{i,j-1})_{L_{i,j}})}{{\rm d}(\varphi_{i,j-1})_{L_{i,j}}} \right) \\ \mathbf{0}_{L_{i,j}}^{\top} \end{bmatrix}
 $$
 
 Similarly, the Jacobian $\frac{\partial\psi_m(\kappa_m)}{\partial\kappa_m} : \mathbb{R}^{L_{\text{out}}} \to \mathbb{R}^{L_{\text{out}}^a \times L_{\text{out}}}$ of the pre-activation function vector at block $m$ is given by:
 
 $$
-\frac{\partial\psi_m(\kappa_m)}{\partial\kappa_m} = \begin{bmatrix} \text{diag}\left\{ \frac{{\rm d}\varrho_{m,1}((\kappa_m)_1)}{{\rm d}(\kappa_m)_1}, \ldots, \frac{{\rm d}\varrho_{m,L_{\text{out}}}((\kappa_m)_{L_{\text{out}}})}{{\rm d}(\kappa_m)_{L_{\text{out}}}} \right\} \\ \mathbf{0}_{L_{\text{out}}}^{\top} \end{bmatrix}
+\frac{\partial\psi_m(\kappa_m)}{\partial\kappa_m} = \begin{bmatrix} \text{diag}\left( \frac{{\rm d}\varrho_{m,1}((\kappa_m)_1)}{{\rm d}(\kappa_m)_1}, \ldots, \frac{{\rm d}\varrho_{m,L_{\text{out}}}((\kappa_m)_{L_{\text{out}}})}{{\rm d}(\kappa_m)_{L_{\text{out}}}} \right) \\ \mathbf{0}_{L_{\text{out}}}^{\top} \end{bmatrix}
 $$
