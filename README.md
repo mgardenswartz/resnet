@@ -81,10 +81,22 @@ then rerun first-time setup.
 </table>
 
 The deep residual neural network (ResNet) architecture, characterized by skip connections and hierarchical feature extraction, models incremental changes rather than complete transformations of the underlying nonlinear mapping. This architecture learns the differences (or "residuals") between input and desired output at each layer, thereby enabling effective function approximation for complex nonlinear systems without requiring explicit governing equations. A fully-connected feedforward ResNet is constructed as follows.
+Let $b \in \mathbb{Z}_{\ge 0}$ be the number of building blocks,
+let the input be $x \in \mathbb{R}^{L_{\text{in}}}$,
+and let the output be $y \in \mathbb{R}^{L_{\text{out}}}$,
+where $L_{\text{in}}, L_{\text{out}} \in \mathbb{Z}_{\ge 1}$.
+For each block index $i \in \{0, \ldots, b\}$,
+let $k_i \in \mathbb{Z}_{\ge 1}$ denote the number of hidden layers in the $i^{\text{th}}$ block,
+let $\kappa_i \in \mathbb{R}^{L_{i,0}}$ denote the block input,
+and let $\theta_i \in \mathbb{R}^{p_i}$ denote the vector of parameters
+(weights and biases) associated with the $i^{\text{th}}$ block.
+Note that $\kappa_0 \triangleq x$ and $L_{0,0} \triangleq L_{\text{in}}$.
 
-Let $b \in \mathbb{Z}_{\ge 0}$ be the number of building blocks, let the input be $x \in \mathbb{R}^{L_{\text{in}}}$, and let the output be $y \in \mathbb{R}^{L_{\text{out}}}$, where $L_{\text{in}}, L_{\text{out}} \in \mathbb{Z}_{\ge 1}$. For each block index $i \in \{0, \ldots, b\}$, let $k_i \in \mathbb{Z}_{\ge 1}$ denote the number of hidden layers in the $i^{\text{th}}$ block, let $\kappa_i \in \mathbb{R}^{L_{i,0}}$ denote the block input, and let $\theta_i \in \mathbb{R}^{p_i}$ denote the vector of parameters (weights and biases) associated with the $i^{\text{th}}$ block. Note that $\kappa_0 \triangleq x$ and $L_{0,0} \triangleq L_{\text{in}}$.
-
-For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i+1\}$, let $L_{i,j} \in \mathbb{Z}_{\ge 1}$ denote the number of neurons in the $j^{\text{th}}$ layer for the $i^{\text{th}}$ block. For all $(i,j) \in \{0, \dots, b\} \times \{0, \dots, k_i\}$, define the augmented dimension $L_{i,j}^a \triangleq L_{i,j}+1$.
+For all $(i,j) \in \{0, \ldots, b\} \times \{0, \ldots, k_i+1\}$,
+let $L_{i,j} \in \mathbb{Z}_{\ge 1}$ denote the number of neurons
+in the $j^{\text{th}}$ layer for the $i^{\text{th}}$ block.
+For all $(i,j) \in \{0, \dots, b\} \times \{0, \dots, k_i\}$,
+define the augmented dimension $L_{i,j}^a \triangleq L_{i,j}+1$.
 
 Each block function $\Phi_i : \mathbb{R}^{L_{i,0}^a} \times \mathbb{R}^{p_i} \to \mathbb{R}^{L_{i,k_i+1}}$ is a fully connected, feedforward deep neural network (DNN) with $L_{i,k_i+1} \triangleq L_{\text{out}}$ for all $i \in \{0, \dots, b\}$. For any input $v \in \mathbb{R}^{L_{i,j}^a}$, the DNN is defined recursively by:
 
