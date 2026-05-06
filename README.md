@@ -13,8 +13,8 @@ rm -rf venv
 pyenv install -s 3.13.12
 pyenv local 3.13.12
 ```
-[!IMPORTANT]
-Python 3.13.12 is the newest recommended version as more recent versions of Python may have incomplete Jax support.
+> [!IMPORTANT]
+> Python 3.13.12 is the newest recommended version as more recent versions of Python may have incomplete Jax support.
 
 ### Subsequent Setup
 ```bash
@@ -39,8 +39,8 @@ or
 ```bash
 pip install -e ".[cuda13]"
 ```
-[!NOTE]
-Jax does not support Metal and thus Apple GPUs cannot be used.
+> [!NOTE]
+> Jax does not support Metal and thus Apple GPUs cannot be used.
 
 ## Validation with Hand Calculations
 A test file validates the code against hand calculations (by Cristian Nino) of both forward and back propagation.
