@@ -52,6 +52,15 @@ Run the test with
 ```bash
 python -m tests.test_resnet
 ```
+or
+```bash
+pytest
+```
+
+If you are sourcing ROS 2 in your terminal emulator, try
+```bash
+env PYTHONPATH= pytest
+```
 
 ### Reset Virtual Environment
 To redo your virtual environment from scratch,
