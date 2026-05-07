@@ -1,38 +1,28 @@
 import jax
 import jax.numpy as jnp
 
-
-ACTIVATION_MAP = {
-    "linear": 0,
-    "swish": 1,
-    "tanh": 2,
-    "logistic": 3,
-    "softplus": 4,
-    "leaky_relu_approx": 5
-}
-
 # Constants for Class A_quad activation functions
 SOFTPLUS_R = 1.0
 LEAKY_RELU_K = 10.0
 LEAKY_RELU_R = 0.1
 
+ACTIVATION_FUNCS = {
+    "linear": lambda x: x,
+    "swish": lambda x: x * jax.nn.sigmoid(x),
+    "tanh": jnp.tanh,
+    "logistic": jax.nn.sigmoid,
+    "softplus": lambda x: (1.0 / SOFTPLUS_R) * jax.nn.softplus(SOFTPLUS_R * x),
+    "leaky_relu_approx": lambda x: (LEAKY_RELU_R * x + jax.nn.softplus((1.0 - LEAKY_RELU_R) * LEAKY_RELU_K * x)) / LEAKY_RELU_K
+}
+
 
 def _activate(
     s: jax.Array,
-    act_idx: jax.Array,
+    act_name: str,
 ) -> jax.Array:
-    return jax.lax.switch(
-        act_idx,
-        [
-            lambda x: x,                                                # 0: linear
-            lambda x: x * jax.nn.sigmoid(x),                            # 1: swish
-            lambda x: jnp.tanh(x),                                      # 2: tanh
-            lambda x: jax.nn.sigmoid(x),                                # 3: logistic
-            lambda x: (1.0 / SOFTPLUS_R) * jax.nn.softplus(SOFTPLUS_R * x), 
-            lambda x: (LEAKY_RELU_R * x + jax.nn.softplus((1.0 - LEAKY_RELU_R) * LEAKY_RELU_K * x)) / LEAKY_RELU_K 
-        ],
-        s
-    )
+    if act_name not in ACTIVATION_FUNCS:
+        raise ValueError(f"Unknown activation: '{act_name}'. Supported: {list(ACTIVATION_FUNCS.keys())}")
+    return ACTIVATION_FUNCS[act_name](s)
 
 
 def get_total_parameters(
@@ -69,8 +59,8 @@ def _mlp_block(
     hidden_width: int, 
     out_dim: int, 
     k: int, 
-    h_act_idx: jax.Array,
-    o_act_idx: jax.Array,
+    h_act_func: str,
+    o_act_func: str,
 ) -> jax.Array:
     idx = 0
     
@@ -88,12 +78,12 @@ def _mlp_block(
         v_size = (hidden_width + 1) * hidden_width
         v_j = jnp.reshape(theta[idx:idx + v_size], (hidden_width + 1, hidden_width), order='F')
         idx += v_size
-        sigma_a = jnp.append(_activate(phi_j, h_act_idx), 1.0) 
+        sigma_a = jnp.append(_activate(phi_j, h_act_func), 1.0) 
         phi_j = jnp.dot(sigma_a, v_j)
         
     vk_size = (hidden_width + 1) * out_dim
     vk = jnp.reshape(theta[idx:idx + vk_size], (hidden_width + 1, out_dim), order='F')
-    sigma_a_out = jnp.append(_activate(phi_j, o_act_idx), 1.0) 
+    sigma_a_out = jnp.append(_activate(phi_j, o_act_func), 1.0) 
     
     return jnp.dot(sigma_a_out, vk)
 
@@ -107,9 +97,9 @@ def resnet_network(
     b: int,          
     k_0: int,        
     k_i: int,        
-    h_act_idx: jax.Array,
-    o_act_idx: jax.Array,
-    shortcut_act_idx: jax.Array
+    h_act_func: str,
+    o_act_func: str,
+    shortcut_act: str
 ) -> jax.Array:
     idx = 0
     
@@ -118,7 +108,7 @@ def resnet_network(
     idx += b0_params
     
     x_a = jnp.append(x, 1.0)
-    kappa = _mlp_block(x_a, theta_0, d_in, hidden_width, d_out, k_0, h_act_idx, o_act_idx)
+    kappa = _mlp_block(x_a, theta_0, d_in, hidden_width, d_out, k_0, h_act_func, o_act_func)
     
     bi_params = _get_block_parameters(d_out, hidden_width, d_out, k_i)
     
@@ -126,8 +116,8 @@ def resnet_network(
         theta_i = theta[idx:idx + bi_params]
         idx += bi_params
         
-        psi_out = jnp.append(_activate(kappa, shortcut_act_idx), 1.0)
-        kappa = kappa + _mlp_block(psi_out, theta_i, d_out, hidden_width, d_out, k_i, h_act_idx, o_act_idx)
+        psi_out = jnp.append(_activate(kappa, shortcut_act), 1.0)
+        kappa = kappa + _mlp_block(psi_out, theta_i, d_out, hidden_width, d_out, k_i, h_act_func, o_act_func)
         
     return kappa
 
@@ -141,12 +131,12 @@ def compute_jacobian(
     b: int,
     k_0: int,
     k_i: int,
-    h_act_idx: jax.Array,
-    o_act_idx: jax.Array,
-    shortcut_act_idx: jax.Array
+    h_act_func: str,
+    o_act_func: str,
+    shortcut_act: str
 ) -> jax.Array:
     return jax.jacrev(resnet_network, argnums=0)(
-        theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_idx, o_act_idx, shortcut_act_idx
+        theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_func, o_act_func, shortcut_act
     )
 
 

@@ -12,9 +12,9 @@ def test_resnet_verification():
     k_i = 1
     
     # Hand calculations strictly apply tanh everywhere.
-    h_act_idx = jnp.array(2) 
-    o_act_idx = jnp.array(2) 
-    shortcut_act_idx = jnp.array(2)
+    h_act = 'tanh' 
+    o_act = 'tanh' 
+    shortcut_act = 'tanh'
     
     x = jnp.array([0.1, -0.5, 0.25])
     
@@ -43,10 +43,10 @@ def test_resnet_verification():
         [0.0320, -0.0200, -0.0607, 0.0888, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.3347, 0.2509, 1]
     ])
 
-    fwd_out = resnet_network(theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_idx, o_act_idx, shortcut_act_idx)
+    fwd_out = resnet_network(theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act, o_act, shortcut_act)
     assert_allclose(fwd_out, expected_fwd, rtol=1e-4, atol=1e-4)
 
-    jac_out = compute_jacobian(theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_idx, o_act_idx, shortcut_act_idx)
+    jac_out = compute_jacobian(theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act, o_act, shortcut_act)
     
     p0 = len(theta_0)
     p1 = len(theta_1)
