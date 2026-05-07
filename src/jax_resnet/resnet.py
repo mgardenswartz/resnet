@@ -99,7 +99,7 @@ def resnet_network(
     k_i: int,        
     h_act_func: str,
     o_act_func: str,
-    shortcut_act: str
+    shortcut_act_func: str
 ) -> jax.Array:
     idx = 0
     
@@ -116,7 +116,7 @@ def resnet_network(
         theta_i = theta[idx:idx + bi_params]
         idx += bi_params
         
-        psi_out = jnp.append(_activate(kappa, shortcut_act), 1.0)
+        psi_out = jnp.append(_activate(kappa, shortcut_act_func), 1.0)
         kappa = kappa + _mlp_block(psi_out, theta_i, d_out, hidden_width, d_out, k_i, h_act_func, o_act_func)
         
     return kappa
@@ -133,10 +133,10 @@ def compute_jacobian(
     k_i: int,
     h_act_func: str,
     o_act_func: str,
-    shortcut_act: str
+    shortcut_act_func: str
 ) -> jax.Array:
     return jax.jacrev(resnet_network, argnums=0)(
-        theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_func, o_act_func, shortcut_act
+        theta, x, d_in, hidden_width, d_out, b, k_0, k_i, h_act_func, o_act_func, shortcut_act_func
     )
 
 
