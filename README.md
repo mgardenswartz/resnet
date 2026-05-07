@@ -72,8 +72,21 @@ If you are sourcing ROS 2 in your terminal emulator, try
 env PYTHONPATH= pytest
 ```
 
-## Benchmark Different Weight Initializations
-# TODO
+## Weight Initialization Strategies
+
+The `init_resnet_weights` function allows for separate initialization strategies for the inner hidden layers (`h_method`) and the block output layers (`o_method`) to optimally support hybrid activation architectures (e.g., using `he` for inner Swish layers and `xavier` for outer Tanh layers).
+
+| Method | Best Activation ($\varsigma_{i,j}$) | Variance ($\sigma^2$) |
+| :--- | :--- | :--- |
+| **He (Kaiming)** | ReLU, Leaky ReLU, Swish | $\frac{2}{L_{i,j}}$ |
+| **Xavier (Glorot)** | Tanh, Logistic | $\frac{2}{L_{i,j} + L_{i,j+1}}$ |
+| **Orthogonal** | RNNs / Deep ResNets | $V_{i,j}^{\top}V_{i,j} = I$ |
+| **Zero** | Residual block outputs | $0$ |
+
+### Usage Recommendations
+* **He Initialization:** Use when the majority of hidden layers utilize `swish` or `leaky_relu_approx`. It prevents signal attenuation in non-saturating architectures.
+* **Xavier Initialization:** Use when utilizing `tanh` hidden layers. It keeps the signal variance stable to prevent premature saturation of the activation functions.
+* **Zero Initialization:** Automatically applied by the library to the output of residual blocks. This ensures that at the start of training, the residual blocks contribute nothing, allowing the base block $\Phi_0$ to handle the initial approximation.
 
 ## Reset Virtual Environment
 To redo your virtual environment from scratch,
