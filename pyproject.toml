@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jax-resnet"
-version = "1.0.0"
+version = "1.1.0"
 description = "A lightweight JAX ResNet implementation for controls research"
 readme = "README.md"
 requires-python = ">=3.10"
