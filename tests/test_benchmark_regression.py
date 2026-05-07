@@ -6,7 +6,7 @@ def mse_loss(theta, x, y, h_act_func, o_act_func):
     # Vectorize the network to handle batch inputs
     batched_net = jax.vmap(lambda xi: resnet_network(
         theta=theta, x=xi, d_in=1, hidden_width=16, d_out=1,
-        b=2, k_0=2, k_i=2, h_act_func=h_act_func, o_act_func=o_act_func, shortcut_act="linear"
+        b=2, k_0=2, k_i=2, h_act_func=h_act_func, o_act_func=o_act_func, shortcut_act_func="linear"
     ))
     preds = batched_net(x)
     return jnp.mean((preds - y)**2)
