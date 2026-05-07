@@ -42,6 +42,16 @@ pip install -e ".[cuda13]"
 > [!NOTE]
 > Jax does not support Metal and thus Apple GPUs cannot be used.
 
+If you're having trouble getting it to recognize the GPU, try
+```bash
+pip uninstall -y jax jaxlib jax-cuda13-plugin jax-cuda13-pjrt nvidia-cudnn-cu13 nvidia-cublas-cu13 nvidia-cuda-runtime-cu13
+pip install -U "jax[cuda13]"
+```
+To see the GPU devices Jax sees
+```bash
+python -c "import jax; print(f'Devices: {jax.devices()}'); print(f'Platform: {jax.default_backend()}')"
+```
+
 ## Validation with Hand Calculations
 A test file validates the code against hand calculations (by Cristian Nino) of both forward and back propagation.
 To see this, run the following setup in addition to the above,
@@ -50,7 +60,7 @@ pip install -e ".[test]"
 ```
 Run the test with
 ```bash
-python -m tests.test_resnet
+python -m tests.very_hand_calcs
 ```
 or
 ```bash
@@ -62,7 +72,10 @@ If you are sourcing ROS 2 in your terminal emulator, try
 env PYTHONPATH= pytest
 ```
 
-### Reset Virtual Environment
+## Benchmark Different Weight Initializations
+# TODO
+
+## Reset Virtual Environment
 To redo your virtual environment from scratch,
 ```bash
 deactivate

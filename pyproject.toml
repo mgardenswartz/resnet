@@ -23,12 +23,10 @@ dependencies = [
 
 [project.optional-dependencies]
 cuda12 = [
-    "jax[cuda12_pip]", 
-    "nvidia-cudnn-cu12",
+    "jax[cuda12]", 
 ]
 cuda13 = [
-    "jax[cuda13_pip]", 
-    "nvidia-cudnn-cu13",
+    "jax[cuda13]", 
 ]
 test = [
     "pytest",
