@@ -60,7 +60,7 @@ pip install -e ".[test]"
 ```
 Run the test with
 ```bash
-python -m tests.very_hand_calcs
+python -m tests.verify_hand_calcs
 ```
 or
 ```bash
